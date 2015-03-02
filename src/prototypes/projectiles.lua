@@ -1,66 +1,55 @@
-data:extend(
+local baseTermite = 
 {
+	type = "projectile",
+	flags = {"not-on-map"},
+	acceleration = 0.005,
+	action =
 	{
-    type = "projectile",
-    name = "explosive-termites",
-    flags = {"not-on-map"},
-    acceleration = 0.005,
-    action =
-    {
-      type = "direct",
-      action_delivery =
-      {
-        type = "instant",
-        target_effects =
-        {
-          {
-            type = "create-entity",
-            entity_name = "termite-detonation"
-          },
-          {
-            type = "nested-result",
-            action =
-            {
-              type = "area",
-              perimeter = 0.9,
-              action_delivery =
-              {
-                type = "instant",
-                target_effects =
-                {
-                  {
-                    type = "damage",
-                    damage = {amount = 1, type = "explosion"}
-                  },
-                  {
-                    type = "create-entity",
-                    entity_name = "explosion"
-                  }
-                }
-              }
-            },
-          }
-        }
-      }
-    },
-    light = {intensity = 0.5, size = 4},
-    animation =
-    {
-      filename = "__Explosive Termites__/graphics/Termite.png",
-      frame_count = 1,
-      frame_width = 32,
-      frame_height = 32,
-      priority = "high"
-    },
-    shadow =
-    {
-      filename = "__base__/graphics/entity/poison-capsule/poison-capsule-shadow.png",
-      frame_count = 1,
-      frame_width = 32,
-      frame_height = 32,
-      priority = "high"
-    },
-    smoke = capsule_smoke,
-  }
+		type = "direct",
+		action_delivery =
+		{
+			type = "instant",
+			target_effects =
+			{
+				{
+					type = "create-entity",
+					trigger_createdentity = "true"
+				},
+				{
+					type = "create-entity",
+				}
+			}
+		}
+	},
+	light = {intensity = 0.5, size = 4},
+	animation =
+	{
+		frame_count = 1,
+		width = 32,
+		height = 32,
+		priority = "high"
+	},
+	shadow =
+	{
+		filename = "__base__/graphics/entity/poison-capsule/poison-capsule-shadow.png",
+		frame_count = 1,
+		width = 32,
+		height = 32,
+		priority = "high"
+	},
+	smoke = capsule_smoke,
 }
-)
+
+local ExplosiveTermite = util.table.deepcopy(baseTermite)
+ExplosiveTermite.name = "explosive-termites"
+ExplosiveTermite.action.action_delivery.target_effects[1].entity_name = "termite-detonation"
+ExplosiveTermite.action.action_delivery.target_effects[2].entity_name = "explosion"
+ExplosiveTermite.animation.filename = "__Explosive Termites__/graphics/Termite.png"
+
+local AlienExplosiveTermite = util.table.deepcopy(baseTermite)
+AlienExplosiveTermite.name = "alien-explosive-termites"
+AlienExplosiveTermite.action.action_delivery.target_effects[1].entity_name = "alien-termite-detonation"
+AlienExplosiveTermite.action.action_delivery.target_effects[2].entity_name = "huge-explosion"
+AlienExplosiveTermite.animation.filename = "__Explosive Termites__/graphics/Alien-Termite.png"
+
+data:extend({ExplosiveTermite, AlienExplosiveTermite})
