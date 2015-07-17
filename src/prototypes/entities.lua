@@ -41,28 +41,29 @@ data:extend(
 		}
 	},
 	{
-			type = "smoke",
-			name = "alien-termite-cloud",
-			flags = {"not-on-map", "placeable-off-grid"},
-			show_when_smoke_off = true,
-			animation =
-			{
-				filename = "__base__/graphics/entity/cloud/cloud-45-frames.png",
-				priority = "low",
-				width = 256,
-				height = 256,
-				frame_count = 45,
-				animation_speed = 3,
-				line_length = 7,
-				scale = 5,
-			},
-			slow_down_factor = 0,
-			wind_speed_factor = 0,
-			cyclic = true,
-			duration = 60 * 14,
-			fade_away_duration =  120,
-			spread_duration = 0,
-			color = { r = 0.58, g = 0.08, b = 0.64 },
-		}
+    type = "smoke-with-trigger",
+    name = "alien-termite-cloud",
+    flags = {"not-on-map", "placeable-off-grid"},
+    show_when_smoke_off = true,
+    animation =
+    {
+		filename = "__base__/graphics/entity/cloud/cloud-45-frames.png",
+		priority = "low",
+		width = 256,
+		height = 256,
+		frame_count = 45,
+		animation_speed = 3,
+		line_length = 7,
+		scale = 3,
+    },
+    slow_down_factor = 0,
+    affected_by_wind = false,
+    cyclic = true,
+    duration = 60 * 14,
+    fade_away_duration = 120,
+    spread_duration = 0,
+    color = { r = 0.58, g = 0.08, b = 0.64 },
+    action_frequency = 30
+	}
 }
 )

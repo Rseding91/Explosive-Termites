@@ -13,7 +13,7 @@ local baseTermite =
 			{
 				{
 					type = "create-entity",
-					trigger_createdentity = "true"
+					trigger_created_entity = "true"
 				},
 				{
 					type = "create-entity",
@@ -49,7 +49,7 @@ ExplosiveTermite.animation.filename = "__Explosive Termites__/graphics/Termite.p
 local AlienExplosiveTermite = util.table.deepcopy(baseTermite)
 AlienExplosiveTermite.name = "alien-explosive-termites"
 AlienExplosiveTermite.action.action_delivery.target_effects[1].entity_name = "alien-termite-detonation"
-AlienExplosiveTermite.action.action_delivery.target_effects[2].entity_name = "huge-explosion"
+AlienExplosiveTermite.action.action_delivery.target_effects[2].entity_name = "medium-explosion"
 AlienExplosiveTermite.animation.filename = "__Explosive Termites__/graphics/Alien-Termite.png"
 
 data:extend({ExplosiveTermite, AlienExplosiveTermite})

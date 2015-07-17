@@ -37,48 +37,53 @@ local loaded
 local knownNames
 
 function ticker()
-	if glob.termites ~= nil then
+	if global.termites ~= nil then
 		if game.tick % 3 == 0 then
 			processTermites()
 		end
 	else
-		game.onevent(defines.events.ontick, nil)
+		game.on_event(defines.events.on_tick, nil)
 	end
 end
 
-game.onload(function()
+game.on_load(function()
 	if not loaded then
 		loaded = true
 		
-		if glob.termites ~= nil then
-			game.onevent(defines.events.ontick, ticker)
+		if global.termites ~= nil then
+      for k,v in pairs(global.termites) do
+        if v.suface == nil then
+          v.surface = game.get_surface(1)
+        end
+      end
+			game.on_event(defines.events.on_tick, ticker)
 		end
 	end
 end)
 
-game.oninit(function()
+game.on_init(function()
 	loaded = true
 	
-	if glob.termites ~= nil then
-		game.onevent(defines.events.ontick, ticker)
+	if global.termites ~= nil then
+		game.on_event(defines.events.on_tick, ticker)
 	end
 end)
 
-game.onevent(defines.events.ontriggercreatedentity, function(event)
+game.on_event(defines.events.on_trigger_created_entity, function(event)
 	if knownNames[event.entity.name] then
-		if glob.termites == nil then
-			glob.termites = {}
-			game.onevent(defines.events.ontick, ticker)
+		if global.termites == nil then
+			global.termites = {}
+			game.on_event(defines.events.on_tick, ticker)
 		end
-		knownNames[event.entity.name](event.entity.position)
+		knownNames[event.entity.name](event.entity.position, event.entity.surface)
 		event.entity.destroy()
 	end
 end)
 
-function setupSwarmType1(position)
+function setupSwarmType1(position, surface)
 	local swarm = {}
 	local initialRadius = swarmSettings[1]["initialRadius"]
-	local maybeTrees = game.findentitiesfiltered{area = {{x = position.x - initialRadius, y = position.y - initialRadius}, {x = position.x + initialRadius, y = position.y + initialRadius}}, type = "tree"}
+	local maybeTrees = surface.find_entities_filtered{area = {{x = position.x - initialRadius, y = position.y - initialRadius}, {x = position.x + initialRadius, y = position.y + initialRadius}}, type = "tree"}
 	
 	swarm.startTick = game.tick
 	swarm.currentRange = initialRadius
@@ -86,6 +91,7 @@ function setupSwarmType1(position)
 	swarm.trees = {}
 	swarm.validTrees = {}
 	swarm.type = 1
+  swarm.surface = surface
 	
 	for k,tree in pairs(maybeTrees) do
 		distX = math.abs(swarm.origin.x - tree.position.x)
@@ -101,10 +107,10 @@ function setupSwarmType1(position)
 		end
 	end
 	
-	table.insert(glob.termites, swarm)
+	table.insert(global.termites, swarm)
 end
 
-function setupSwarmType2(position)
+function setupSwarmType2(position, surface)
 	local swarm = {}
 	
 	swarm.startTick = game.tick
@@ -117,30 +123,31 @@ function setupSwarmType2(position)
 	swarm.type = 2
 	swarm.phase = 1
 	swarm.completedVeinCount = 0
-	game.createentity({name = "alien-termite-cloud", position = position})
+  swarm.surface = surface
+	swarm.surface.create_entity({name = "alien-termite-cloud", position = position})
 	
-	table.insert(glob.termites, swarm)
+	table.insert(global.termites, swarm)
 end
 
 function processTermites()
-	for k,swarm in pairs(glob.termites) do
+	for k,swarm in pairs(global.termites) do
 		if swarm.type == nil then
 			if not tickSwarmType0(swarm) then
-				table.remove(glob.termites, k)
+				table.remove(global.termites, k)
 			end
 		elseif swarmTickers[swarm.type] then
 			if not swarmTickers[swarm.type](swarm) then
-				table.remove(glob.termites, k)
+				table.remove(global.termites, k)
 			end
 		end
 	end
 	
-	if #glob.termites == 0 then
-		glob.termites = nil
+	if #global.termites == 0 then
+		global.termites = nil
 	end
 end
 
-remote.addinterface("termites", {
+remote.add_interface("termites", {
 	test = function()
 		for _,player in pairs(game.players) do
 			player.insert({name = "explosive-termites", count = 64})
@@ -149,7 +156,7 @@ remote.addinterface("termites", {
 	end
 })
 
-function getVeinGroups(source, settings)
+function getVeinGroups(source, settings, surface)
 	local segmentLengths = settings["lengths"]
 	local startWidths = settings["startWidths"]
 	local endWidths = settings["endWidths"]
@@ -195,7 +202,7 @@ function getVeinGroups(source, settings)
 		vertx = {pos1.x, pos2.x, pos4.x, pos3.x}
 		verty = {pos1.y, pos2.y, pos4.y, pos3.y}
 		
-		local entities = game.findentitiesfiltered({area = area, type = "tree"})
+		local entities = surface.find_entities_filtered({area = area, type = "tree"})
 		local data = {}
 		for _,tree in pairs(entities) do
 			if foundPos[tree.position.x] == nil or foundPos[tree.position.x][tree.position.y] == nil then
@@ -212,7 +219,7 @@ function getVeinGroups(source, settings)
 		currentPosition.x = currentPosition.x + segmentLengths[n] * math.cos(currentOrientation * math.pi / 180)
 		currentPosition.y = currentPosition.y + segmentLengths[n] * math.sin(currentOrientation * math.pi / 180)
 		local radius = endWidths[n] / 2
-		local maybeTrees = game.findentitiesfiltered{area = {{x = currentPosition.x - radius, y = currentPosition.y - radius}, {x = currentPosition.x + radius, y = currentPosition.y + radius}}, type = "tree"}
+		local maybeTrees = surface.find_entities_filtered{area = {{x = currentPosition.x - radius, y = currentPosition.y - radius}, {x = currentPosition.x + radius, y = currentPosition.y + radius}}, type = "tree"}
 		local distX, distY
 		for k,tree in pairs(maybeTrees) do
 			distX = math.abs(currentPosition.x - tree.position.x)
@@ -260,20 +267,20 @@ function tickSwarmType2(swarm)
 		elseif math.random(5) == 1 then
 			local x = (randomSign() * math.random(10)) + swarm.origin.x
 			local y = (randomSign() * math.random(10)) + swarm.origin.y
-			game.createentity({name = "huge-explosion", position = {x = x, y = y}})
+			swarm.surface.create_entity({name = "medium-explosion", position = {x = x, y = y}})
 		end
 	elseif swarm.phase == 2 then
 		local health
 		local phaseStep = swarm.phaseStep
 		
 		if phaseStep == 1 then
-			swarm.vein = getVeinGroups(swarm.origin, generateSettings(swarm))
+			swarm.vein = getVeinGroups(swarm.origin, generateSettings(swarm), swarm.surface)
 			swarm.phaseStep = 2
 		elseif phaseStep > swarmSettings[swarm.type]["swarmTicksBetweenVeins"] then
 			for k,group in pairs(swarm.vein) do
 				for i,tree in pairs(group) do
 					if tree.valid then
-						game.createentity
+						swarm.surface.create_entity
 						{
 							name = "explosion",
 							position = tree.position,
@@ -294,7 +301,7 @@ function tickSwarmType2(swarm)
 				swarm.completedVeinCount = nil
 				
 				local radius = swarm.currentRange
-				local maybeTrees = game.findentitiesfiltered{area = {{x = swarm.origin.x - radius, y = swarm.origin.y - radius}, {x = swarm.origin.x + radius, y = swarm.origin.y + radius}}, type = "tree"}
+				local maybeTrees = swarm.surface.find_entities_filtered{area = {{x = swarm.origin.x - radius, y = swarm.origin.y - radius}, {x = swarm.origin.x + radius, y = swarm.origin.y + radius}}, type = "tree"}
 				for k,tree in pairs(maybeTrees) do
 					distX = math.abs(swarm.origin.x - tree.position.x)
 					distY = math.abs(swarm.origin.y - tree.position.y)
@@ -309,7 +316,7 @@ function tickSwarmType2(swarm)
 					end
 				end
 			else
-				swarm.vein = getVeinGroups(swarm.origin, generateSettings(swarm))
+				swarm.vein = getVeinGroups(swarm.origin, generateSettings(swarm), swarm.surface)
 				swarm.phaseStep = 2
 			end
 		else
@@ -317,7 +324,7 @@ function tickSwarmType2(swarm)
 			if math.random(5) == 1 then
 				local x = (randomSign() * math.random(10)) + swarm.origin.x
 				local y = (randomSign() * math.random(10)) + swarm.origin.y
-				game.createentity({name = "huge-explosion", position = {x = x, y = y}})
+				swarm.surface.create_entity({name = "medium-explosion", position = {x = x, y = y}})
 			end
 		end
 	elseif swarm.phase == 3 then
@@ -352,7 +359,7 @@ function tickSwarmType2(swarm)
 						
 						if validTrees[treeX][treeY] == 0 then
 							validTrees[treeX][treeY] = 1
-							nearTrees = game.findentitiesfiltered({area = {{x = treeX - spreadRadius, y = treeY - spreadRadius}, {x = treeX + spreadRadius, y = treeY + spreadRadius}}, type = "tree"})
+							nearTrees = swarm.surface.find_entities_filtered({area = {{x = treeX - spreadRadius, y = treeY - spreadRadius}, {x = treeX + spreadRadius, y = treeY + spreadRadius}}, type = "tree"})
 							for _,tree2 in pairs(nearTrees) do
 								foundTreeX = tree2.position.x
 								foundTreeY = tree2.position.y
@@ -372,7 +379,7 @@ function tickSwarmType2(swarm)
 							end
 						end
 					else
-						game.createentity({name = "explosion", position = tree.position, })
+						swarm.surface.create_entity({name = "explosion", position = tree.position, })
 						table.remove(swarm.trees, k)
 						tree.destroy()
 					end
@@ -505,7 +512,7 @@ function tickSwarmType1(swarm)
 					
 					if swarm.validTrees[treeX][treeY] == 0 then
 						swarm.validTrees[treeX][treeY] = 1
-						nearTrees = game.findentitiesfiltered({area = {{x = treeX - spreadRadius, y = treeY - spreadRadius}, {x = treeX + spreadRadius, y = treeY + spreadRadius}}, type = "tree"})
+						nearTrees = swarm.surface.find_entities_filtered({area = {{x = treeX - spreadRadius, y = treeY - spreadRadius}, {x = treeX + spreadRadius, y = treeY + spreadRadius}}, type = "tree"})
 						for _,tree2 in pairs(nearTrees) do
 							foundTreeX = tree2.position.x
 							foundTreeY = tree2.position.y
@@ -525,7 +532,7 @@ function tickSwarmType1(swarm)
 						end
 					end
 				else
-					game.createentity
+					swarm.surface.create_entity
 					{
 						name = "explosion",
 						position = tree.position,
@@ -572,7 +579,7 @@ function tickSwarmType0(swarm)
 						
 						if swarm.more.validTrees[treeX][treeY] == 0 then
 							swarm.more.validTrees[treeX][treeY] = 1
-							nearTrees = game.findentitiesfiltered{area = {{x = treeX - spreadRadius, y = treeY - spreadRadius}, {x = treeX + spreadRadius, y = treeY + spreadRadius}}, type = "tree"}
+							nearTrees = swarm.surface.find_entities_filtered{area = {{x = treeX - spreadRadius, y = treeY - spreadRadius}, {x = treeX + spreadRadius, y = treeY + spreadRadius}}, type = "tree"}
 							for _,tree in pairs(nearTrees) do
 								distX = math.abs(treeX - tree.position.x)
 								distY = math.abs(treeY - tree.position.y)
@@ -589,7 +596,7 @@ function tickSwarmType0(swarm)
 							end
 						end
 					else
-						game.createentity
+						swarm.surface.create_entity
 						{
 							name = "explosion",
 							position = tree.position,
