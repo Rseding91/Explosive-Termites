@@ -33,7 +33,6 @@ local directionRanges =
 }
 
 local swarmTickers
-local loaded
 local knownNames
 
 function ticker()
@@ -42,38 +41,31 @@ function ticker()
 			processTermites()
 		end
 	else
-		game.on_event(defines.events.on_tick, nil)
+		script.on_event(defines.events.on_tick, nil)
 	end
 end
 
-game.on_load(function()
-	if not loaded then
-		loaded = true
-		
-		if global.termites ~= nil then
-      for k,v in pairs(global.termites) do
-        if v.suface == nil then
-          v.surface = game.get_surface(1)
-        end
+script.on_configuration_changed(function(data)
+  if global.termites ~= nil then
+    for k,v in pairs(global.termites) do
+      if v.suface == nil then
+        v.surface = game.get_surface(1)
       end
-			game.on_event(defines.events.on_tick, ticker)
-		end
-	end
+    end
+  end
 end)
 
-game.on_init(function()
-	loaded = true
-	
-	if global.termites ~= nil then
-		game.on_event(defines.events.on_tick, ticker)
-	end
+script.on_load(function()
+  if global.termites ~= nil then
+    script.on_event(defines.events.on_tick, ticker)
+  end
 end)
 
-game.on_event(defines.events.on_trigger_created_entity, function(event)
+script.on_event(defines.events.on_trigger_created_entity, function(event)
 	if knownNames[event.entity.name] then
 		if global.termites == nil then
 			global.termites = {}
-			game.on_event(defines.events.on_tick, ticker)
+			script.on_event(defines.events.on_tick, ticker)
 		end
 		knownNames[event.entity.name](event.entity.position, event.entity.surface)
 		event.entity.destroy()
