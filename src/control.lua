@@ -1,4 +1,3 @@
-require "defines"
 require "util"
 
 local swarmSettings =
@@ -49,7 +48,7 @@ script.on_configuration_changed(function(data)
   if global.termites ~= nil then
     for k,v in pairs(global.termites) do
       if v.suface == nil then
-        v.surface = game.get_surface(1)
+        v.surface = game.surfaces[1]
       end
     end
   end
