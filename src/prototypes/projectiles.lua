@@ -13,7 +13,7 @@ local baseTermite =
       {
         {
           type = "create-entity",
-          trigger_created_entity = "true"
+          trigger_created_entity = true
         },
         {
           type = "create-entity",

@@ -11,7 +11,6 @@ data:extend(
     max_health = 1,
     selection_box = {{-0.5, 0.5}, {0.5, .05}},
     collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
-    collision_mask = {"object-layer"},
     pictures = 
     {
       {
@@ -32,7 +31,6 @@ data:extend(
     max_health = 1,
     selection_box = {{-0.5, 0.5}, {0.5, .05}},
     collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
-    collision_mask = {"object-layer"},
     pictures = 
     {
       {

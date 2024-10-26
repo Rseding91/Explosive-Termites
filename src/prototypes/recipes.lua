@@ -3,25 +3,31 @@ data:extend(
   {
     type = "recipe",
     name = "explosive-termites",
-    enabled = "true",
+    enabled = true,
     ingredients =
     {
-      {"wood", 10},
-      {"coal", 20}
+      {type = "item", name = "wood", amount = 10},
+      {type = "item", name = "coal", amount = 20}
     },
-    result = "explosive-termites"
+    results =
+    {
+      {type = "item", name = "explosive-termites", amount = 1}
+    }
   },
   {
     type = "recipe",
     name = "alien-explosive-termites",
-    enabled = "true",
+    enabled = true,
     ingredients =
     {
-      {"wood", 50},
-      {"coal", 50},
-      {"explosive-termites", 5}
+      {type = "item", name = "wood", amount = 50},
+      {type = "item",name = "coal", amount = 50},
+      {type = "item", name = "explosive-termites", amount = 5}
     },
-    result = "alien-explosive-termites"
+    results =
+    {
+      {type = "item", name = "alien-explosive-termites", amount = 1}
+    }
   }
 }
 )

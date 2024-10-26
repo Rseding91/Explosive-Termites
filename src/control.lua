@@ -35,7 +35,7 @@ local swarmTickers
 local knownNames
 
 function ticker()
-  if global.termites ~= nil then
+  if storage.termites ~= nil then
     if game.tick % 3 == 0 then
       processTermites()
     end
@@ -45,8 +45,8 @@ function ticker()
 end
 
 script.on_configuration_changed(function(data)
-  if global.termites ~= nil then
-    for k,v in pairs(global.termites) do
+  if storage.termites ~= nil then
+    for k,v in pairs(storage.termites) do
       if v.suface == nil then
         v.surface = game.surfaces[1]
       end
@@ -55,15 +55,15 @@ script.on_configuration_changed(function(data)
 end)
 
 script.on_load(function()
-  if global.termites ~= nil then
+  if storage.termites ~= nil then
     script.on_event(defines.events.on_tick, ticker)
   end
 end)
 
 script.on_event(defines.events.on_trigger_created_entity, function(event)
   if knownNames[event.entity.name] then
-    if global.termites == nil then
-      global.termites = {}
+    if storage.termites == nil then
+      storage.termites = {}
       script.on_event(defines.events.on_tick, ticker)
     end
     knownNames[event.entity.name](event.entity.position, event.entity.surface)
@@ -98,7 +98,7 @@ function setupSwarmType1(position, surface)
     end
   end
   
-  table.insert(global.termites, swarm)
+  table.insert(storage.termites, swarm)
 end
 
 function setupSwarmType2(position, surface)
@@ -117,24 +117,24 @@ function setupSwarmType2(position, surface)
   swarm.surface = surface
   swarm.surface.create_entity({name = "alien-termite-cloud", position = position})
   
-  table.insert(global.termites, swarm)
+  table.insert(storage.termites, swarm)
 end
 
 function processTermites()
-  for k,swarm in pairs(global.termites) do
+  for k,swarm in pairs(storage.termites) do
     if swarm.type == nil then
       if not tickSwarmType0(swarm) then
-        table.remove(global.termites, k)
+        table.remove(storage.termites, k)
       end
     elseif swarmTickers[swarm.type] then
       if not swarmTickers[swarm.type](swarm) then
-        table.remove(global.termites, k)
+        table.remove(storage.termites, k)
       end
     end
   end
   
-  if #global.termites == 0 then
-    global.termites = nil
+  if #storage.termites == 0 then
+    storage.termites = nil
   end
 end
 
