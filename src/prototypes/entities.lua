@@ -47,7 +47,7 @@ data:extend(
     show_when_smoke_off = true,
     animation =
     {
-      filename = "__base__/graphics/entity/cloud/cloud-45-frames.png",
+      filename = "__Explosive Termites__/graphics/cloud-45-frames.png",
       priority = "low",
       width = 256,
       height = 256,
@@ -56,14 +56,12 @@ data:extend(
       line_length = 7,
       scale = 3,
     },
-    slow_down_factor = 0,
     affected_by_wind = false,
     cyclic = true,
     duration = 60 * 14,
     fade_away_duration = 120,
     spread_duration = 0,
-    color = { r = 0.58, g = 0.08, b = 0.64 },
-    action_frequency = 30
+    color = { r = 0.58, g = 0.08, b = 0.64 }
   }
 }
 )

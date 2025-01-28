@@ -10,14 +10,13 @@ data:extend(
       type = "throw",
       attack_parameters =
       {
-      type = "projectile",
+        type = "projectile",
         ammo_category = "capsule",
         cooldown = 30,
         projectile_creation_distance = 0.6,
         range = 45,
         ammo_type =
         {
-          category = "capsule",
           target_type = "position",
           action =
           {
@@ -46,14 +45,13 @@ data:extend(
       type = "throw",
       attack_parameters =
       {
-      type = "projectile",
+        type = "projectile",
         ammo_category = "capsule",
         cooldown = 30,
         projectile_creation_distance = 0.6,
         range = 90,
         ammo_type =
         {
-          category = "capsule",
           target_type = "position",
           action =
           {
